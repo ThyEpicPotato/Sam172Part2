@@ -1,14 +1,8 @@
 # app.py
 from flask import Flask, request, jsonify, render_template
-import lucene
-from sample import retrieve
+from sample import lucene_index
 
 app = Flask(__name__)
-
-directory = "/home/cs172/redditCrawler"
-
-# Initialize Lucene VM
-lucene.initVM(vmargs=['-Djava.awt.headless=true'])
 
 @app.route('/')
 def index():
@@ -18,9 +12,9 @@ def index():
 def search():
     query = request.args.get('query', '')
     if query:
-        results = retrieve(directory, query)
+        results = lucene_index.retrieve(query)
         return jsonify(results)
     return jsonify([])
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=8888)
