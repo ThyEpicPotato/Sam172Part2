@@ -18,15 +18,6 @@
             font-weight: bold;
             display: block;
         }
-        .result-link {
-            display: block;
-            margin-top: 10px;
-            text-decoration: none;
-            color: #007bff;
-        }
-        .result-link:hover {
-            text-decoration: underline;
-        }
     </style>
     <script>
         async function search() {
@@ -44,14 +35,8 @@
                     title.textContent = result.title;
                     const content = document.createElement('span');
                     content.textContent = result.content;
-                    const link = document.createElement('a');
-                    link.classList.add('result-link');
-                    link.href = result.permalink;
-                    link.target = '_blank';
-                    link.textContent = 'Read more';
                     resultItem.appendChild(title);
                     resultItem.appendChild(content);
-                    resultItem.appendChild(link);
                     resultsDiv.appendChild(resultItem);
                 });
             } else {
