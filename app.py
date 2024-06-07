@@ -13,8 +13,7 @@ def search():
     query = request.args.get('query', '')
     if query:
         results = lucene_index.retrieve(query)
-        truncated_results = [{'title': res['title'], 'content': res['content'][:100]} for res in results[:10]]
-        return jsonify(truncated_results)
+        return jsonify(results)
     return jsonify([])
 
 if __name__ == '__main__':
