@@ -48,6 +48,7 @@ class LuceneIndex:
             if regex.fullmatch(filename):
                 print(f"Indexing: {filename}")
                 with open(os.path.join(dir, filename), 'r') as f:
+                    writer.addDocument(doc)
                     data = json.load(f)
                     for post in data:
                         context = ""
@@ -64,7 +65,7 @@ class LuceneIndex:
                                 doc.add(Field(key, str(data), contextType))
                                 context += str(data)
                         doc.add(Field("context", context, contextType))
-                    writer.addDocument(doc)
+                    
         writer.close()
         print("Indexing complete")
 
