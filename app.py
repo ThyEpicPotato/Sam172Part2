@@ -15,7 +15,7 @@ def search():
         results = lucene_index.retrieve(query)
         formatted_results = [{
             'title': res['title'],
-            'content': res['content'],
+            'content': (res['content'][:200] + '...') if len(res['content']) > 200 else res['content'],
             'permalink': res.get('permalink', '#')
         } for res in results[:10]]
         return jsonify(formatted_results)
