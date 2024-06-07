@@ -4,6 +4,8 @@ from sample import lucene_index
 
 app = Flask(__name__)
 
+REDDIT_BASE_URL = "https://www.reddit.com"
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -16,7 +18,7 @@ def search():
         formatted_results = [{
             'title': res['title'],
             'content': (res['content'][:200] + '...') if len(res['content']) > 200 else res['content'],
-            'permalink': res.get('permalink', '#')
+            'permalink': REDDIT_BASE_URL + res['permalink'] if not res['permalink'].startswith('http') else res['permalink']
         } for res in results[:10]]
         return jsonify(formatted_results)
     return jsonify([])
