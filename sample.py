@@ -82,10 +82,10 @@ def search_api():
     if not query:
         return jsonify([])
 
-    directory = "/home/cs172/redditCrawler"  # Update this to your actual directory containing the index
+    directory = "/home/cs172/redditCrawler" 
     results = retrieve(directory, query)
     return jsonify(results)
 
 if __name__ == '__main__':
     lucene.initVM(vmargs=['-Djava.awt.headless=true'])
-    app.run(host='0.0.0.0', port=5000)  # Ensure this port is open on your server's firewall
+    app.run(host='0.0.0.0', port=5000) 
