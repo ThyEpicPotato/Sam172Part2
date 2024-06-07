@@ -2,16 +2,13 @@ import os
 import re
 import json
 import lucene
-from flask import Flask, request, jsonify
 from java.nio.file import Paths
-from org.apache.lucene.store import NIOFSDirectory, SimpleFSDirectory
+from org.apache.lucene.store import SimpleFSDirectory
 from org.apache.lucene.analysis.standard import StandardAnalyzer
 from org.apache.lucene.document import Document, Field, FieldType
 from org.apache.lucene.queryparser.classic import QueryParser
 from org.apache.lucene.index import IndexOptions, IndexWriter, IndexWriterConfig, DirectoryReader
 from org.apache.lucene.search import IndexSearcher
-
-app = Flask(__name__)
 
 def create_index(dir):
     if not os.path.exists(dir):
@@ -61,7 +58,7 @@ def create_index(dir):
 
 def retrieve(storedir, query):
     print("Retrieving Documents")
-    searchDir = NIOFSDirectory(Paths.get(storedir))
+    searchDir = SimpleFSDirectory(Paths.get(storedir))
     searcher = IndexSearcher(DirectoryReader.open(searchDir))
     parser = QueryParser('context', StandardAnalyzer())
     parsed_query = parser.parse(query)
@@ -76,16 +73,9 @@ def retrieve(storedir, query):
 def useMetaType(key):
     return key in ['permalink', 'id', 'url', 'score', 'upvote_ratio', 'created_utc', 'num_comments', 'author']
 
-@app.route('/search', methods=['GET'])
-def search_api():
-    query = request.args.get('query')
-    if not query:
-        return jsonify([])
-
-    directory = "/home/cs172/redditCrawler" 
-    results = retrieve(directory, query)
-    return jsonify(results)
+# Ensure lucene VM is initialized when this module is imported
+lucene.initVM(vmargs=['-Djava.awt.headless=true'])
 
 if __name__ == '__main__':
-    lucene.initVM(vmargs=['-Djava.awt.headless=true'])
-    app.run(host='0.0.0.0', port=5000) 
+    directory = "/path/to/your/index/directory"  # Update this path
+    create_index(directory)
