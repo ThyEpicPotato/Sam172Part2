@@ -8,11 +8,20 @@
         body {
             padding: 20px;
         }
-        .result-title {
-            font-weight: bold;
+        .result-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
-        .result-content {
+        .result-link {
             display: block;
+            margin-top: 10px;
+            text-decoration: none;
+            color: #007bff;
+        }
+        .result-link:hover {
+            text-decoration: underline;
         }
     </style>
     <script>
@@ -25,15 +34,16 @@
             if (results.length > 0) {
                 results.forEach(result => {
                     const resultItem = document.createElement('div');
-                    resultItem.classList.add('result-item', 'mb-3', 'p-2', 'border', 'rounded');
-                    const title = document.createElement('span');
-                    title.classList.add('result-title');
-                    title.textContent = result.title ? `${result.title}: ` : '';
+                    resultItem.classList.add('result-item');
                     const content = document.createElement('span');
-                    content.classList.add('result-content');
                     content.textContent = result.content;
-                    resultItem.appendChild(title);
+                    const link = document.createElement('a');
+                    link.classList.add('result-link');
+                    link.href = result.permalink;
+                    link.target = '_blank';
+                    link.textContent = 'Read more';
                     resultItem.appendChild(content);
+                    resultItem.appendChild(link);
                     resultsDiv.appendChild(resultItem);
                 });
             } else {
