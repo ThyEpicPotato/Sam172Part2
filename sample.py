@@ -1,14 +1,25 @@
-import os
+import time
 import re
 import json
+
+import logging, sys
+logging.disable(sys.maxsize)
+
+import os
 import lucene
 from java.nio.file import Paths
-from org.apache.lucene.store import SimpleFSDirectory
+from org.apache.lucene.store import MMapDirectory, SimpleFSDirectory, NIOFSDirectory
 from org.apache.lucene.analysis.standard import StandardAnalyzer
 from org.apache.lucene.document import Document, Field, FieldType
 from org.apache.lucene.queryparser.classic import QueryParser
-from org.apache.lucene.index import IndexOptions, IndexWriter, IndexWriterConfig, DirectoryReader
-from org.apache.lucene.search import IndexSearcher
+from org.apache.lucene.index import FieldInfo, IndexWriter, IndexWriterConfig, IndexOptions, DirectoryReader
+from org.apache.lucene.search import IndexSearcher, BoostQuery, Query
+from org.apache.lucene.search.similarities import BM25Similarity
+
+def useMetaType(key:str):
+    if key == ('permalink' or 'id' or 'url' or 'score' or 'upvote_ratio' or 'created_utc' or 'num_comments' or 'author'):
+        return True
+    return False
 
 def create_index(dir):
     if not os.path.exists(dir):
@@ -38,6 +49,7 @@ def create_index(dir):
             with open(os.path.join(dir, filename), 'r') as f:
                 data = json.load(f)
                 for post in data:
+                    # Mash everything into context for breadth search.
                     context = ""
                     doc = Document()
                     for key in post:
@@ -51,31 +63,48 @@ def create_index(dir):
                         else:
                             doc.add(Field(key, str(data), contextType))
                             context += str(data)
+
                     doc.add(Field("context", context, contextType))
+
+                f.close()
                 writer.addDocument(doc)
     writer.close()
     print("Done Indexing")
 
 def retrieve(storedir, query):
     print("Retrieving Documents")
-    searchDir = SimpleFSDirectory(Paths.get(storedir))
+    searchDir = NIOFSDirectory(Paths.get(storedir))
     searcher = IndexSearcher(DirectoryReader.open(searchDir))
+
+    # Change context to the keys that are in the post<provide analyzer type for each key>
     parser = QueryParser('context', StandardAnalyzer())
     parsed_query = parser.parse(query)
+
     topDocs = searcher.search(parsed_query, 10).scoreDocs
-    results = []
+    topkdocs = []
+    print("Top 10 docs: ")
+    i = 1
     for hit in topDocs:
+        print(f"Document {i}: ")
+        i += 1
         doc = searcher.doc(hit.doc)
-        result = {field.name(): doc.get(field.name()) for field in doc.getFields()}
-        results.append(result)
-    return results
+        print(doc.get("title"))
+    print("Done retrieving documents")
+    return topkdocs
 
-def useMetaType(key):
-    return key in ['permalink', 'id', 'url', 'score', 'upvote_ratio', 'created_utc', 'num_comments', 'author']
+# need to change directory to match cs172 server directory
+directory = "/home/cs172/redditCrawler"
 
-# Ensure lucene VM is initialized when this module is imported
 lucene.initVM(vmargs=['-Djava.awt.headless=true'])
+create_index(directory)
+query = "experiment"
+loop = True
+while loop:
+    print("\nHit enter with no input to quit.")
+    while(isinstance(query, str)):
+        query = input("Enter a string: ")
+        if query == '':
+            loop = False
+            break
 
-if __name__ == '__main__':
-    directory = "/path/to/your/index/directory"  # Update this path
-    create_index(directory)
+        topkDocs = retrieve(directory, query)
