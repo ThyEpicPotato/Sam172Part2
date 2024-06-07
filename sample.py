@@ -1,4 +1,3 @@
-# sample.py
 import os
 import re
 import json
@@ -66,7 +65,7 @@ class LuceneIndex:
         writer.close()
 
     def retrieve(self, query):
-        self.vm_env.attachCurrentThread()  # Ensure the current thread is attached to the JVM
+        self.vm_env.attachCurrentThread()
         searchDir = NIOFSDirectory(Paths.get(self.directory))
         searcher = IndexSearcher(DirectoryReader.open(searchDir))
         parser = QueryParser('context', StandardAnalyzer())
@@ -81,6 +80,5 @@ class LuceneIndex:
             })
         return results
 
-# Initialize the Lucene index
 directory = "/home/cs172/redditCrawler"
 lucene_index = LuceneIndex(directory)
