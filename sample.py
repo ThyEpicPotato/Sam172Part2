@@ -25,6 +25,7 @@ class LuceneIndex:
     def create_index(self, dir):
         if not os.path.exists(dir):
             os.mkdir(dir)
+        print("Creating Index")
         store = SimpleFSDirectory(Paths.get(dir))
         analyzer = StandardAnalyzer()
         config = IndexWriterConfig(analyzer)
@@ -42,8 +43,10 @@ class LuceneIndex:
 
         regex = re.compile(r'.*\d+\.json')
 
+        print(f"Indexing JSON files in {dir}")
         for filename in os.listdir(dir):
             if regex.fullmatch(filename):
+                print(f"Indexing: {filename}")
                 with open(os.path.join(dir, filename), 'r') as f:
                     data = json.load(f)
                     for post in data:
@@ -63,8 +66,10 @@ class LuceneIndex:
                         doc.add(Field("context", context, contextType))
                     writer.addDocument(doc)
         writer.close()
+        print("Indexing complete")
 
     def retrieve(self, query):
+        print("Retrieving Documents")
         self.vm_env.attachCurrentThread()
         searchDir = NIOFSDirectory(Paths.get(self.directory))
         searcher = IndexSearcher(DirectoryReader.open(searchDir))
@@ -72,13 +77,31 @@ class LuceneIndex:
         parsed_query = parser.parse(query)
         topDocs = searcher.search(parsed_query, 10).scoreDocs
         results = []
+        print("Top 10 documents:")
         for hit in topDocs:
             doc = searcher.doc(hit.doc)
             results.append({
                 'title': doc.get("title"),
                 'content': doc.get("context")
             })
+            print(doc.get("title"))
+        print("Document retrieval complete")
         return results
 
+# Initialize the Lucene index
 directory = "/home/cs172/redditCrawler"
 lucene_index = LuceneIndex(directory)
+
+# Command line interface for testing
+if __name__ == '__main__':
+    query = "experiment"
+    loop = True
+    while loop:
+        print("\nHit enter with no input to quit.")
+        query = input("Enter a string: ")
+        if query == '':
+            loop = False
+            break
+        results = lucene_index.retrieve(query)
+        for result in results:
+            print(result)
