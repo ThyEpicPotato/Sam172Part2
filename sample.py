@@ -1,3 +1,4 @@
+# sample.py
 import os
 import re
 import json
@@ -9,6 +10,7 @@ from org.apache.lucene.document import Document, Field, FieldType
 from org.apache.lucene.queryparser.classic import QueryParser
 from org.apache.lucene.index import IndexOptions, IndexWriter, IndexWriterConfig, DirectoryReader
 from org.apache.lucene.search import IndexSearcher
+from org.apache.lucene.util import Version
 
 def useMetaType(key: str):
     return key in ['permalink', 'id', 'url', 'score', 'upvote_ratio', 'created_utc', 'num_comments', 'author']
@@ -56,6 +58,7 @@ def create_index(dir):
     writer.close()
 
 def retrieve(storedir, query):
+    lucene.getVMEnv().attachCurrentThread()  # Ensure the current thread is attached to the JVM
     searchDir = NIOFSDirectory(Paths.get(storedir))
     searcher = IndexSearcher(DirectoryReader.open(searchDir))
     parser = QueryParser('context', StandardAnalyzer())
