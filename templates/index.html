@@ -2,72 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reddit Search Engine</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f8f9fa;
-        }
-        .container {
-            text-align: center;
-        }
-        input[type="text"] {
-            width: 300px;
-            padding: 10px;
-            margin: 20px 0;
-        }
-        input[type="submit"] {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-        .results {
-            margin-top: 20px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Reddit Search Engine</h1>
-        <form id="searchForm">
-            <input type="text" id="query" placeholder="Enter your search term" required>
-            <input type="submit" value="Search">
-        </form>
-        <div class="results" id="results"></div>
-    </div>
-
+    <title>Search</title>
     <script>
-        document.getElementById('searchForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+        async function search() {
             const query = document.getElementById('query').value;
+            const response = await fetch(`/search?query=${encodeURIComponent(query)}`);
+            const results = await response.json();
             const resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = '';
-
-            try {
-                const response = await fetch(`/search?query=${query}`);
-                const results = await response.json();
-
+            if (results.length > 0) {
+                const ul = document.createElement('ul');
                 results.forEach(result => {
-                    const resultItem = document.createElement('div');
-                    resultItem.innerHTML = `<h3>${result.title}</h3><p>${result.content}</p>`;
-                    resultsDiv.appendChild(resultItem);
+                    const li = document.createElement('li');
+                    const title = document.createElement('strong');
+                    title.textContent = result.title ? `${result.title}: ` : '';
+                    const content = document.createElement('span');
+                    content.textContent = result.content;
+                    li.appendChild(title);
+                    li.appendChild(content);
+                    ul.appendChild(li);
                 });
-            } catch (error) {
-                resultsDiv.innerHTML = '<p>Error fetching results. Please try again.</p>';
+                resultsDiv.appendChild(ul);
+            } else {
+                resultsDiv.textContent = 'No results found.';
             }
-        });
+        }
     </script>
+</head>
+<body>
+    <h1>Search</h1>
+    <input type="text" id="query" placeholder="Enter search query">
+    <button onclick="search()">Search</button>
+    <div id="results"></div>
 </body>
 </html>
