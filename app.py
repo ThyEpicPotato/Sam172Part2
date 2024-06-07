@@ -1,4 +1,5 @@
-# app.py
+## In the terminal, "export FLASK_APP=app"
+## then "flask run -h 0.0.0.0 -p 8888"
 from flask import Flask, request, jsonify, render_template
 from sample import lucene_index
 
