@@ -48,11 +48,12 @@ class LuceneIndex:
             if regex.fullmatch(filename):
                 print(f"Indexing: {filename}")
                 with open(os.path.join(dir, filename), 'r') as f:
-                    writer.addDocument(doc)
+                    
                     data = json.load(f)
                     for post in data:
                         context = ""
                         doc = Document()
+                        writer.addDocument(doc)
                         for key in post:
                             data = post[key]
                             if key == "comments":
