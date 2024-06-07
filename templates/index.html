@@ -3,6 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Search</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 20px;
+        }
+        .result-title {
+            font-weight: bold;
+        }
+        .result-content {
+            display: block;
+        }
+    </style>
     <script>
         async function search() {
             const query = document.getElementById('query').value;
@@ -11,18 +23,19 @@
             const resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = '';
             if (results.length > 0) {
-                const ul = document.createElement('ul');
                 results.forEach(result => {
-                    const li = document.createElement('li');
-                    const title = document.createElement('strong');
+                    const resultItem = document.createElement('div');
+                    resultItem.classList.add('result-item', 'mb-3', 'p-2', 'border', 'rounded');
+                    const title = document.createElement('span');
+                    title.classList.add('result-title');
                     title.textContent = result.title ? `${result.title}: ` : '';
                     const content = document.createElement('span');
+                    content.classList.add('result-content');
                     content.textContent = result.content;
-                    li.appendChild(title);
-                    li.appendChild(content);
-                    ul.appendChild(li);
+                    resultItem.appendChild(title);
+                    resultItem.appendChild(content);
+                    resultsDiv.appendChild(resultItem);
                 });
-                resultsDiv.appendChild(ul);
             } else {
                 resultsDiv.textContent = 'No results found.';
             }
@@ -30,9 +43,15 @@
     </script>
 </head>
 <body>
-    <h1>Search</h1>
-    <input type="text" id="query" placeholder="Enter search query">
-    <button onclick="search()">Search</button>
-    <div id="results"></div>
+    <div class="container">
+        <h1 class="my-4">Search</h1>
+        <div class="input-group mb-3">
+            <input type="text" id="query" class="form-control" placeholder="Enter search query">
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="button" onclick="search()">Search</button>
+            </div>
+        </div>
+        <div id="results" class="mt-4"></div>
+    </div>
 </body>
 </html>
