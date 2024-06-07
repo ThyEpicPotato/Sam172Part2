@@ -14,6 +14,10 @@
             border: 1px solid #ddd;
             border-radius: 5px;
         }
+        .result-title {
+            font-weight: bold;
+            display: block;
+        }
         .result-link {
             display: block;
             margin-top: 10px;
@@ -35,6 +39,9 @@
                 results.forEach(result => {
                     const resultItem = document.createElement('div');
                     resultItem.classList.add('result-item');
+                    const title = document.createElement('span');
+                    title.classList.add('result-title');
+                    title.textContent = result.title;
                     const content = document.createElement('span');
                     content.textContent = result.content;
                     const link = document.createElement('a');
@@ -42,6 +49,7 @@
                     link.href = result.permalink;
                     link.target = '_blank';
                     link.textContent = 'Read more';
+                    resultItem.appendChild(title);
                     resultItem.appendChild(content);
                     resultItem.appendChild(link);
                     resultsDiv.appendChild(resultItem);
